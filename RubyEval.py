@@ -64,7 +64,6 @@ class RubyEvalCommand(sublime_plugin.TextCommand, EvalAsRuby):
             else:
                 # eval selected
                 script = self.view.substr(region)
-                print script
                 output = self.eval_as_ruby(script)
                 start = min(region.a, region.b)
                 if output_to_editor:
