@@ -6,7 +6,7 @@ class EvalAsRuby:
         try:
             return self.view.settings().get("ruby_eval").get("ruby")
         except AttributeError:
-            return "ruby"
+            return "rubyw"
 
     def eval_as_ruby(self, script):
         proc = subprocess.Popen(self.ruby(),
@@ -57,25 +57,19 @@ class RubyEvalCommand(sublime_plugin.TextCommand, EvalAsRuby):
                 script = self.view.substr(region_of_line)
                 output = self.eval_as_ruby(script)
                 if output_to_editor:
-                    self.insert_output(output, region, edit, region_of_line.b, "\n")
+                  self.view.erase(edit, region_of_line)
+                  self.view.insert(edit, region_of_line.a, output)
                 else:
-                    pass # TODO
+                  pass # TODO
             else:
                 # eval selected
                 script = self.view.substr(region)
+                print script
                 output = self.eval_as_ruby(script)
-                start = max(region.a, region.b)
-                space = "" if script[-1] == "\n" else " "
+                start = min(region.a, region.b)
                 if output_to_editor:
-                    self.insert_output(output, region, edit, start, space)
-                else:
-                    pass # TODO
+                  self.view.erase(edit, region)
 
-    def insert_output(self, output, region, edit, start, space):
-        self.view.insert(edit, start, space + output)
-        self.view.sel().subtract(region)
-        len_of_space = len(space)
-        self.view.sel().add(
-          sublime.Region(
-            start + len_of_space,
-            start + len_of_space + len(output.replace("\n", ''))))
+                  self.view.insert(edit, start, output)
+                else:
+                  pass # TODO
